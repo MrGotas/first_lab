@@ -1,96 +1,135 @@
 #include "libs/massive.h"
 
-struct Massive {
-        
-};
-
-
-int getParam(string* command, string* value, int* index, string actions);
-int toNum(const string& temporary, int* index);
-
-void massive(string file, string actions){
-    string command, value;
-    int index;
-
-    if (getParam(&command, &value, &index, actions) == 1){
-        cout << "ERROR: incorrect arguments" << endl;
+void massive(string fileName, string actions){
+    stringstream words(actions);
+    string elem;
+    int countWords = 0;
+    while (words >> elem){
+        countWords ++;
+    }
+    if (countWords > 3){
+        cout << "13:ERROR: A lot of arguments" << endl;
         return;
     }
 
-    
-}
-
-int getParam(string* command, string* value, int* index, string actions){
-    string temporary = "", firPar = "", secPar = "";
-    int countSpase = 0;
-    int countParam = 0;
-    for (size_t i = 0; actions[i] != '\0'; i++){
-        if (actions[i] == ' '){
-            countSpase ++;
-            if (countSpase >= 3 || actions[i + 1] == ' '){
-                return 1;
-            }
+    stringstream ss(actions);
+    string word, command, temp1, temp2;
+    ss >> word;
+    bool firSymbol = false;
+    for (char symbol : word){
+        if (firSymbol){
+            command += symbol;
+            continue;
         }
-
-        if (actions[i] != ' '){
-            temporary += actions[i];
-        }
-
-        if (countParam == 0 && (countSpase == 1 || actions[i + 1] == '\0')){
-            firPar = temporary;
-            countParam ++;
-            temporary = "";
-        }
-
-        if (countParam == 1 && (countSpase == 2 || actions[i + 1] == '\0')){
-            secPar = temporary;
-            countParam ++;
-            temporary = "";
-        }
+        firSymbol = true;
     }
+    ss >> temp1;
+    ss >> temp2;
 
-    if (firPar == ""){
-        return 1;
-    }
-    if (firPar != "PUSH" && firPar != "PUSHI" && firPar != "TAKE" && firPar != "DEL" && firPar != "SIZE" && firPar != "GET") {
-       return 1;
+    StrArray array;
+
+    if (fs::exists(fileName)){
+        ifstream file (fileName);
+        string line;
+        getline(file, line);
+        file.close();
+
+        stringstream ss(line);
+        string item;
+
+        while (getline(ss, item, ';')){
+            array.push(item);
+        }
     }else{
-        *command = firPar;
+        ofstream file(fileName);
+        file.close();
     }
 
-    if (*command == "PUSH"){
-        *value = secPar;
-    }
-
-    if (*command == "PUSHI"){
-        *value = secPar;
-        if (toNum(temporary, index) == 1){
-            return 1;
+    if (command == "PUSH" && countWords == 2){
+        array.push(temp1);
+    }else if (emptyFile(fileName)){
+        cout << "12:ERROR: Empty file" << endl;
+        fs::remove(fileName);
+        return;
+    }else if (command == "PUSHI" && countWords == 3){
+        int index;
+        if (!toNum(temp1, index)){
+            return;
         }
+        array.pushi(index, temp2);
+    }else if (command == "GET" && countWords == 2){
+        int index;
+        if (!toNum(temp1, index)){
+            return;
+        }
+        string result;
+        if (!array.get(index, result)){
+            return;
+        }
+        cout << result << endl;
+    }else if (command == "DEL" && countWords == 2){
+        int index;
+        if (!toNum(temp1, index)){
+            return;
+        }
+        array.del(index);
+    }else if (command == "REPLACE" && countWords == 3){
+        int index;
+        if (!toNum(temp1, index)){
+            return;
+        }
+        array.replace(index, temp2);
+    }else if (command == "SIZE" && countWords == 1){
+        cout << array.sizeM() << endl;
+    }else if (command == "PRINT" && countWords == 1){
+        ifstream file(fileName);
+        string result;
+        getline(file, result);
+        cout << result << endl;
+        file.close();
+    }else{
+        cout << "5:ERROR: Unknown command." << endl;
+        return;
     }
 
-    cout << "(firPar)" << *command << "(secPar) " << *value << " (temp) " << *index << endl;////////////////////////////////////////////////
-    return 0;
+    array.saveToFile(fileName);
+
+    if (emptyFile(fileName)) fs::remove(fileName);
 }
 
-int toNum(const string& temporary, int* index) {
+bool toNum(const string& temporary, int& index) {
     int result = 0;
     int startIndex = 0;
 
     if (temporary[0] == '-') {
-        return 1;
+        cout << "7:ERROR: Negative index." << endl;
+        return false;
     }
 
     while (temporary[startIndex] != '\0') {
         char charc = temporary[startIndex];
         if (charc < '0' || charc > '9') {
-            return 1;
+            cout << "8:ERROR: Not a number." << endl;
+            return false;
         }
 
         result = result * 10 + (charc - '0');
         startIndex++;
     }
 
-    *index = result;
-    return 0;
+    index = result;
+    return true;
+}
+
+bool emptyFile (string fileName) {
+    ifstream file (fileName);
+
+    string temp;
+    if(getline(file, fileName)){
+        file.close();
+        return false;
+    }else{
+        file.close();
+        return true;
+    }
 }

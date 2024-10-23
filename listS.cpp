@@ -1,6 +1,6 @@
-#include "libs/queue.h"
+#include "libs/listS.h"
 
-void queue(string fileName, string actions){
+void listS(string fileName, string actions){
     stringstream words(actions);
     string elem;
     int countWords = 0;
@@ -15,17 +15,17 @@ void queue(string fileName, string actions){
     stringstream ss(actions);
     string word, command, temp;
     ss >> word;
-    bool firSymbol = false;
+    int symbols = 0;
     for (char symbol : word){
-        if (firSymbol){
+        if (symbols == 2){
             command += symbol;
             continue;
         }
-        firSymbol = true;
+        symbols++;
     }
     ss >> temp;
 
-    Queue queue;
+    ListS list;
 
     if (fs::exists(fileName)){
         ifstream file (fileName);
@@ -37,21 +37,27 @@ void queue(string fileName, string actions){
         string item;
 
         while (getline(ss, item, ';')){
-            queue.push(item);
+            list.pusht(item);
         }
     }else{
         ofstream file(fileName);
         file.close();
     }
 
-    if (command == "PUSH" && countWords == 2){
-        queue.push(temp);
+    if (command == "PUSHT" && countWords == 2){
+        list.pusht(temp);
+    }else if (command == "PUSHH" && countWords == 2){
+        list.pushh(temp);
     }else if (emptyFile(fileName)){
         cout << "2:ERROR: Empty file" << endl;
         fs::remove(fileName);
         return;
-    }else if (command == "DEL" && countWords == 1){
-        queue.del();
+    }else if (command == "DELH" && countWords == 1){
+        list.delh();
+    }else if (command == "DELT" && countWords == 1){
+        list.delt();
+    }else if (command == "DELV" && countWords == 2){
+        list.delv(temp);
     }else if (command == "PRINT" && countWords == 1){
         ifstream file(fileName);
         string result;
@@ -63,7 +69,7 @@ void queue(string fileName, string actions){
         return;
     }
 
-    queue.saveToFile(fileName);
+    list.saveToFile(fileName);
 
     if (emptyFile(fileName)) fs::remove(fileName);
 }

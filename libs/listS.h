@@ -1,5 +1,5 @@
-#ifndef LISTD_H_INCLUDED
-#define LISTD_H_INCLUDED
+#ifndef LISTS_H_INCLUDED
+#define LISTS_H_INCLUDED
 
 #include <iostream>
 #include <filesystem>
@@ -9,21 +9,20 @@
 using namespace std;
 namespace fs = std::filesystem;
 
-struct ListD {
+struct ListS {
     // Определение узла списка
     struct Node {
         string data;
         Node* next;
-        Node* prev;
-        Node(const string& value) : data(value), next(nullptr), prev(nullptr) {}
+        Node(const string& value) : data(value), next(nullptr) {}
     };
 
     Node* head;
     Node* tail;
 
-    ListD() : head(nullptr), tail(nullptr) {}
+    ListS() : head(nullptr), tail(nullptr) {}
 
-    ~ListD() {
+    ~ListS() {
         while (head != nullptr) {
             Node* temp = head;
             head = head->next;
@@ -34,9 +33,6 @@ struct ListD {
     void pushh(const string& value) {
         Node* newNode = new Node(value);
         newNode->next = head;
-        if (head != nullptr) {
-            head->prev = newNode;
-        }
         head = newNode;
         if (tail == nullptr) {
             tail = head;
@@ -49,7 +45,6 @@ struct ListD {
             head = tail = newNode;
         } else {
             tail->next = newNode;
-            newNode->prev = tail;
             tail = newNode;
         }
     }
@@ -61,9 +56,7 @@ struct ListD {
         }
         Node* temp = head;
         head = head->next;
-        if (head != nullptr) {
-            head->prev = nullptr;
-        } else {
+        if (head == nullptr) {
             tail = nullptr;
         }
         delete temp;
@@ -79,10 +72,13 @@ struct ListD {
             head = tail = nullptr;
             return;
         }
-        Node* temp = tail;
-        tail = tail->prev;
+        Node* current = head;
+        while (current->next != tail) {
+            current = current->next;
+        }
+        delete tail;
+        tail = current;
         tail->next = nullptr;
-        delete temp;
     }
 
     void delv(const string& value) {
@@ -95,33 +91,19 @@ struct ListD {
             return;
         }
         Node* current = head;
-        while (current != nullptr && current->data != value) {
+        while (current->next != nullptr && current->next->data != value) {
             current = current->next;
         }
-        if (current == nullptr) {
+        if (current->next == nullptr) {
             cout << "Элемент не найден." << endl;
             return;
         }
-        if (current->next != nullptr) {
-            current->next->prev = current->prev;
-        } else {
-            tail = current->prev;
+        Node* temp = current->next;
+        current->next = current->next->next;
+        if (current->next == nullptr) {
+            tail = current;
         }
-        if (current->prev != nullptr) {
-            current->prev->next = current->next;
-        } else {
-            head = current->next;
-        }
-        delete current;
-    }
-
-    void printList() {
-        Node* current = head;
-        while (current != nullptr) {
-            cout << current->data << " ";
-            current = current->next;
-        }
-        cout << endl;
+        delete temp;
     }
 
     void saveToFile(const string& filename) {
@@ -138,7 +120,7 @@ struct ListD {
     }
 };
 
-void listD(string file, string actions);
+void listS(string file, string actions);
 bool emptyFile (string fileName);
 
-#endif // LISTD_H_INCLUDED
+#endif // LISTS_H_INCLUDED
