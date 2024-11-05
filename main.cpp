@@ -10,24 +10,27 @@ bool inputFormat(string userInput, string& fileName, string& actions);
 
 int main (int argc, char* argv[]) {
     if (argc != 1){
-        if (argc != 5){
+        if (argc < 5){
             cout << "1:ERROR: Unknown command." << endl;
             argc = 1;
         }
     }
 
     string fileName, actions;
-    if (argc == 5){
+    if (argc >= 5){
         if (string(argv[1]) != "--file" || string(argv[3]) != "--query"){
             cout << "2:ERROR: Unknown command." << endl;
             argc = 1;
         }else{
             string temp = argv[2];
             fileName = "files/" + temp;
-            actions = argv[4];
+            for (size_t i = 4; i < argc; i ++){
+                actions = actions + argv[i];
+                actions += ' ';
+            }
         }
     }
-
+    
     while (true){
         if (argc == 1){
             string userInput;

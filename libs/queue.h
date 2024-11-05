@@ -7,7 +7,7 @@
 #include <string>
 
 using namespace std;
-namespace fs = std::filesystem;
+namespace fs = filesystem;
 
 struct Queue {
     struct Node {

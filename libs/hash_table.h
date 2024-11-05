@@ -7,7 +7,7 @@
 #include <string>
 
 using namespace std;
-namespace fs = std::filesystem;
+namespace fs = filesystem;
 
 struct HashTable {
     struct KeyValuePair {
@@ -53,7 +53,7 @@ struct HashTable {
         KeyValuePair* current = table[hash];
         while (current != nullptr) {
             if (current->key == key) {
-                cout << "ERROR: Key already exists." << endl;
+                cout << "6:ERROR: Key already exists." << endl;
                 return;
             }
             current = current->next;

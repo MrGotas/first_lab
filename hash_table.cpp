@@ -8,7 +8,7 @@ void hash_table(string fileName, string actions){
         countWords ++;
     }
     if (countWords > 3){
-        cout << "13:ERROR: A lot of arguments" << endl;
+        cout << "1:ERROR: A lot of arguments" << endl;
         return;
     }
 
@@ -38,7 +38,7 @@ void hash_table(string fileName, string actions){
     if (command == "PUSH" && countWords == 3){
         ht.push(temp1, temp2);
     }else if (emptyFile(fileName)){
-        cout << "12:ERROR: Empty file" << endl;
+        cout << "2:ERROR: Empty file" << endl;
         fs::remove(fileName);
         return;
     }else if (command == "GET" && countWords == 2){
@@ -46,10 +46,10 @@ void hash_table(string fileName, string actions){
         if (ht.get(temp1, result)) {
             cout << result << endl;
         }else{
-            cout << "12:ERROR: Key not found." << endl;
+            cout << "3:ERROR: Key not found." << endl;
         }
     }else if (command == "DEL" && countWords == 2){
-        if (!ht.del(temp1)) cout << "12:ERROR: Key not found." << endl;
+        if (!ht.del(temp1)) cout << "4:ERROR: Key not found." << endl;
     }else if (command == "PRINT" && countWords == 1){
         ifstream file(fileName);
         string result;
